@@ -1,0 +1,35 @@
+SMT-Based BSPDN Standard Cell Generator
+
+SMT-based automatic standard cell layout synthesis targeting BSPDN architectures.
+
+Input:
+    - Nangate CDL transistor netlist
+
+Intermediate Representation:
+    - Cell
+    - Transistors
+    - Nets
+    - Pins
+
+Technology Layer:
+    - GT3/BSPDN rules
+
+Optimization:
+    - SMT (Z3)
+
+Output:
+    - Standard-cell layout
+
+
+## Parser 
+
+Completed:
+- Parsed `.SUBCKT` and created `Cell` objects.
+- Parsed `*.PININFO` and created `Net` objects.
+- Categorized nets as INPUT, OUTPUT, POWER.
+- Stored nets in dictionaries for O(1) lookup.
+- Unified all pins under a single `Net` abstraction.
+
+Architectural Decisions:
+- All electrical connections are represented as `Net` objects.
+- Dictionaries are used instead of lists for efficient lookup and to prevent duplicates.
