@@ -11,10 +11,10 @@ def main():
         return
 
 
-    parser = CDLParser("Benchmarks/NangateOpenCellLibrary.cdl")
+    parser = CDLParser("Benchmarks/gt3_rvt.cdl")
 
     cell = parser.parse_cell(sys.argv[1])
-
+    
     print(cell)
 
 

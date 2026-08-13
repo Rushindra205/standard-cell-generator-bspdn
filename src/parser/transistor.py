@@ -11,9 +11,10 @@ class Transistor:
         drain,
         gate,
         source,
-        bulk,
-        width,
-        length,
+        width=None,
+        length=None,
+        multiplicity=1,
+        wgaa=None,
     ):
         self.name = name
         self.type = transistor_type
@@ -21,10 +22,11 @@ class Transistor:
         self.drain = drain
         self.gate = gate
         self.source = source
-        self.bulk = bulk
-
+        
         self.width = width
         self.length = length
+        self.multiplicity = multiplicity
+        self.wgaa = wgaa
 
     def __str__(self):
         return (
@@ -32,7 +34,7 @@ class Transistor:
             f"  D={self.drain.name}\n"
             f"  G={self.gate.name}\n"
             f"  S={self.source.name}\n"
-            f"  B={self.bulk.name}\n"
-            f"  W={self.width}\n"
-            f"  L={self.length}"
+            f"  WGAA={self.wgaa}\n"
+            f"  L={self.length}\n"
+            f"  M={self.multiplicity}\n"
         )

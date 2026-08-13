@@ -13,19 +13,21 @@ class CDLParser:
     def parse_cell(self, cell_name):
         """
         Returns every line belonging to one .SUBCKT.
-        """
 
-        with open(self.filepath, "r") as file:
+        """
+        target_name = f"gt3_6t_{cell_name}_rvt"
+
+        with open(self.filepath, "r", encoding="latin-1") as file:
 
             for line in file:
 
                 line = line.strip()
 
-                if line.startswith(".SUBCKT"):
+                if line.upper().startswith(".SUBCKT"):
 
                     tokens = line.split()
 
-                    if len(tokens) >= 2 and tokens[1] == cell_name:
+                    if len(tokens) >= 2 and tokens[1] == target_name:
 
                         cell = Cell(tokens[1])
 
@@ -33,13 +35,13 @@ class CDLParser:
 
                             line = line.strip()
 
-                            if line.startswith("*.PININFO"):
+                            if line.upper().startswith("*.PININFO"):
                                 self._parse_pininfo(line, cell)
 
-                            elif line.startswith("M"):
+                            elif line.upper().startswith("M"):
                                 self._parse_transistor(line, cell)
 
-                            elif line.startswith(".ENDS"):
+                            elif line.upper().startswith(".ENDS"):
                                 break
 
                         return cell
@@ -59,12 +61,12 @@ class CDLParser:
                 net_type = "INPUT"
             elif pin_type == "O":
                 net_type = "OUTPUT"
-            elif pin_type == "P":
+            elif name.lower() == "vdd":
                 net_type = "POWER"
-            elif pin_type == "G":
+            elif name.lower() == "vss":
                 net_type = "GROUND"
             else:
-                continue  # Skip unknown pin types
+                net_type = "UNKNOWN"  # Skip unknown pin types
 
             net = Net(name, net_type)
             cell.add_net(net)
@@ -86,9 +88,8 @@ class CDLParser:
         drain_name = tokens[1]
         gate_name = tokens[2]   
         source_name = tokens[3]
-        bulk_name = tokens[4]
-
-        model = tokens[5]
+        
+        model = tokens[4]
 
         if model.upper().startswith("NMOS"):
             transistor_type = "NMOS"    
@@ -101,19 +102,30 @@ class CDLParser:
                 f"Unknown transistor model '{model}' in line:\n{line}"
                 )
 
-        width = None
+        wgaa = None
         length = None
+        multiplicity = 1
 
-        for token in tokens[6:]:
-            if token.startswith("W="):
-                width = float(token[2:-1])
-            elif token.startswith("L="):
-                length = float(token[2:-1])
+        for token in tokens[5:]:
 
+            key, value = token.split("=", 1)
+
+            value = value.rstrip("uU")
+
+            if key.upper() == "WGAA":
+                wgaa = float(value)
+
+            elif key.upper() == "L":
+                length = float(value)
+
+            elif key.upper() == "M":
+                multiplicity = int(value)   
+            
+            
         drain = self._get_or_create_net(cell, drain_name)
         gate = self._get_or_create_net(cell, gate_name)
         source = self._get_or_create_net(cell, source_name)
-        bulk = self._get_or_create_net(cell, bulk_name) 
+         
 
         transistor = Transistor(
             name=name,
@@ -122,15 +134,14 @@ class CDLParser:
             drain=drain,
             gate=gate,      
             source=source,
-            bulk=bulk,
-            width=width,
-            length=length
+            length=length,
+            multiplicity=multiplicity,
+            wgaa=wgaa,
         )
 
         cell.add_transistor(transistor)
         drain.add_transistor(transistor)
         gate.add_transistor(transistor)
         source.add_transistor(transistor)
-        bulk.add_transistor(transistor)
-
+        
         return transistor

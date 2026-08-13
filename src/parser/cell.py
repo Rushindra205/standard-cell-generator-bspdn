@@ -45,6 +45,11 @@ class Cell:
         for net in self.power_nets.values():
             s += f"  {net.name}\n"
 
+        s += "Ground:\n"
+
+        for net in self.ground_nets.values():
+            s += f"  {net.name}\n"
+
         s += f"\nTotal Nets: {len(self.nets)}\n"
 
         s += f"\n Transistors:\n"
@@ -66,5 +71,5 @@ class Cell:
         elif net.net_type == "POWER":
             self.power_nets[net.name] = net
         elif net.net_type == "GROUND":
-            self.power_nets[net.name] = net
+            self.ground_nets[net.name] = net
 
