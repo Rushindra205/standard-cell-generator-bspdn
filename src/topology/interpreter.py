@@ -130,4 +130,4 @@ def is_hierarchical_cell(cell):
     lines rather than from M lines, so a transistor-level parser sees an
     empty cell. That is worth reporting rather than drawing an empty graph.
     """
-    return len(cell.transistors) == 0
+    return len(cell.instances) > 0

@@ -1,6 +1,7 @@
 from parser.cell import Cell
 from parser.net import Net
 from parser.transistor import Transistor
+from parser.instance import Instance
 
 class CDLParser:
     """
@@ -40,6 +41,9 @@ class CDLParser:
 
                             elif line.upper().startswith("M"):
                                 self._parse_transistor(line, cell)
+
+                            elif line.upper().startswith("X"):
+                                self._parse_instance(line,cell)
 
                             elif line.upper().startswith(".ENDS"):
                                 break
@@ -145,3 +149,26 @@ class CDLParser:
         source.add_transistor(transistor)
         
         return transistor
+
+    def _parse_instance(self, line, cell):
+
+        tokens = line.split()
+
+        name = tokens[0]
+
+        model = tokens[-1]
+        connections = tokens[1:-1]
+
+        instance = Instance(
+            name=name,
+            model=model,
+            connections=connections
+        )
+
+        cell.add_instance(instance)
+
+        for net_name in connections:
+            self._get_or_create_net(cell, net_name)
+
+        return instance
+    
